@@ -26,6 +26,7 @@ export function ScratchToReveal() {
   const lastPointRef = useRef(null);
   const isRevealedRef = useRef(false);
   const hasConfettiFiredRef = useRef(false);
+  const lastCheckTimeRef = useRef(0);
 
   const { couple, events } = weddingConfig;
   const weddingEvent = events.find((e) => e.id === 'wedding') || events[4];
@@ -33,6 +34,8 @@ export function ScratchToReveal() {
   // Paint the regal royal maroon & golden scratch foil
   const drawFoil = useCallback((canvas, ctx) => {
     const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 
     canvas.width = rect.width * dpr;
@@ -69,18 +72,18 @@ export function ScratchToReveal() {
 
     // 2. Ornate Traditional South Indian Gold Frame Border
     ctx.strokeStyle = '#FFD77D';
-    ctx.lineWidth = 3.5;
-    ctx.strokeRect(14, 14, w - 28, h - 28);
+    ctx.lineWidth = 3;
+    ctx.strokeRect(12, 12, w - 24, h - 24);
 
     ctx.strokeStyle = 'rgba(201, 146, 47, 0.65)';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(20, 20, w - 40, h - 40);
+    ctx.strokeRect(18, 18, w - 36, h - 36);
 
     // Corner Medallions
     const drawCornerMedallion = (cx, cy) => {
       ctx.fillStyle = '#FFD77D';
       ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#2A080C';
       ctx.lineWidth = 1.5;
@@ -92,69 +95,71 @@ export function ScratchToReveal() {
       ctx.fill();
     };
 
-    drawCornerMedallion(20, 20);
-    drawCornerMedallion(w - 20, 20);
-    drawCornerMedallion(20, h - 20);
-    drawCornerMedallion(w - 20, h - 20);
+    drawCornerMedallion(18, 18);
+    drawCornerMedallion(w - 18, 18);
+    drawCornerMedallion(18, h - 18);
+    drawCornerMedallion(w - 18, h - 18);
+
+    // Center calculations
+    const centerX = w / 2;
+    const centerY = h / 2;
 
     // 3. Top Auspicious Inscription
-    const centerX = w / 2;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    ctx.font = '600 12px "Cinzel", Georgia, serif';
+    ctx.font = '600 11px "Cinzel", Georgia, serif';
     ctx.fillStyle = '#FFD77D';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('॥ SRI GANESHAYA NAMAHA • SHUBH VIVAH ॥', centerX, 44);
+    ctx.letterSpacing = '2px';
+    ctx.fillText('॥ SRI GANESHAYA NAMAHA • SHUBH VIVAH ॥', centerX, 36);
 
     // 4. Center Monogram Crest
-    const centerY = h * 0.42;
+    const crestRadius = Math.min(38, Math.max(30, h * 0.08));
+    const crestY = centerY - 46;
 
-    // Glowing circle behind medallion
-    const circleGrad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 52);
+    const circleGrad = ctx.createRadialGradient(centerX, crestY, 8, centerX, crestY, crestRadius + 6);
     circleGrad.addColorStop(0, '#FFD77D');
     circleGrad.addColorStop(0.5, '#C9922F');
     circleGrad.addColorStop(1, '#2A080C');
 
     ctx.fillStyle = circleGrad;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 46, 0, Math.PI * 2);
+    ctx.arc(centerX, crestY, crestRadius + 5, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#220508';
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 40, 0, Math.PI * 2);
+    ctx.arc(centerX, crestY, crestRadius, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = '#FFD77D';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.font = 'bold 22px "Cinzel", Georgia, serif';
+    ctx.font = 'bold 18px "Cinzel", Georgia, serif';
     ctx.fillStyle = '#FFD77D';
-    ctx.fillText('S & A', centerX, centerY);
+    ctx.fillText('S & A', centerX, crestY);
 
     // 5. Main Scratch Callout Typography
     ctx.font = 'bold 18px "Cinzel", Georgia, serif';
     ctx.fillStyle = '#FFFDF0';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
     ctx.shadowBlur = 8;
-    ctx.fillText('✨ SCRATCH TO REVEAL ✨', centerX, centerY + 75);
+    ctx.fillText('✨ SCRATCH TO REVEAL ✨', centerX, centerY + 18);
 
-    ctx.font = '600 13px "Karla", sans-serif';
+    ctx.font = '600 12px "Karla", sans-serif';
     ctx.fillStyle = '#FFD77D';
     ctx.shadowBlur = 4;
-    ctx.fillText('Main Wedding Date & Couple Photo', centerX, centerY + 102);
+    ctx.fillText('Main Wedding Date & Couple Photo', centerX, centerY + 42);
 
-    ctx.font = 'italic 12px Georgia, serif';
+    ctx.font = 'italic 11px Georgia, serif';
     ctx.fillStyle = '#FFF6D8';
     ctx.shadowBlur = 0;
-    ctx.fillText('(Swipe with finger or drag mouse across to scratch)', centerX, centerY + 128);
+    ctx.fillText('(Rub quickly with finger or mouse to scratch)', centerX, centerY + 64);
 
     // 6. Bottom Auspicious Couple Banner
-    ctx.font = 'bold 13px "Cinzel", Georgia, serif';
-    ctx.fillStyle = 'rgba(255, 215, 125, 0.75)';
-    ctx.fillText('Satish Reddy  weds  Alekhya', centerX, h - 38);
+    ctx.font = 'bold 12px "Cinzel", Georgia, serif';
+    ctx.fillStyle = 'rgba(255, 215, 125, 0.8)';
+    ctx.fillText('Satish Reddy  weds  Alekhya', centerX, h - 32);
   }, []);
 
   // Initialize canvas
@@ -172,12 +177,11 @@ export function ScratchToReveal() {
     drawFoil(canvas, ctx);
   }, [drawFoil]);
 
-  // Handle Resize and Initial Mount
+  // Handle Resize and Container Observer
   useEffect(() => {
-    // Small timeout to ensure DOM rect is calculated after Gopuram / initial render
     const timer = setTimeout(() => {
       initCanvas();
-    }, 60);
+    }, 80);
 
     const handleResize = () => {
       if (!isRevealedRef.current) {
@@ -186,9 +190,22 @@ export function ScratchToReveal() {
     };
 
     window.addEventListener('resize', handleResize);
+
+    // Observe container size to ensure exact fit
+    let observer;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      observer = new ResizeObserver(() => {
+        if (!isRevealedRef.current) {
+          initCanvas();
+        }
+      });
+      observer.observe(containerRef.current);
+    }
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
+      if (observer) observer.disconnect();
     };
   }, [initCanvas]);
 
@@ -198,7 +215,6 @@ export function ScratchToReveal() {
     hasConfettiFiredRef.current = true;
 
     try {
-      // Golden wedding celebration burst
       confetti({
         particleCount: 110,
         spread: 90,
@@ -206,7 +222,6 @@ export function ScratchToReveal() {
         colors: ['#FFD77D', '#C9922F', '#8B202E', '#FFF6D8', '#FFFFFF', '#D49E35'],
       });
 
-      // Second burst for celebratory cascade
       setTimeout(() => {
         confetti({
           particleCount: 60,
@@ -224,7 +239,7 @@ export function ScratchToReveal() {
         });
       }, 250);
     } catch (e) {
-      // Canvas confetti failsafe
+      // Failsafe
     }
   }, []);
 
@@ -240,10 +255,9 @@ export function ScratchToReveal() {
       const data = imgData.data;
       let transparentPixels = 0;
       const totalPixels = data.length / 4;
-      const step = 32; // Sample every 32nd pixel for fluid performance
+      const step = 64; // High-performance sample step for 60fps responsiveness
 
       for (let i = 3; i < data.length; i += step * 4) {
-        // Any pixel with alpha < 128 is treated as scratched/revealed
         if (data[i] < 128) {
           transparentPixels++;
         }
@@ -252,10 +266,11 @@ export function ScratchToReveal() {
       const percent = Math.round((transparentPixels / (totalPixels / step)) * 100);
       setPercentScratched(percent);
 
-      // Trigger automatic reveal past 36% threshold
-      if (percent >= 36 && !isRevealedRef.current) {
+      // Fast auto-reveal trigger at 22% threshold
+      if (percent >= 22 && !isRevealedRef.current) {
         isRevealedRef.current = true;
         setIsRevealed(true);
+        setPercentScratched(100);
         fireConfetti();
       }
 
@@ -265,7 +280,16 @@ export function ScratchToReveal() {
     }
   }, [fireConfetti]);
 
-  // Scratch stroke drawing helper
+  // Throttled percentage checker to keep scratching silky smooth without GPU lock
+  const throttledCheck = useCallback(() => {
+    const now = Date.now();
+    if (now - lastCheckTimeRef.current > 100) {
+      lastCheckTimeRef.current = now;
+      checkScratchPercentage();
+    }
+  }, [checkScratchPercentage]);
+
+  // Scratch stroke drawing helper with wider brush for fast scratching
   const scratch = useCallback((clientX, clientY) => {
     const canvas = canvasRef.current;
     if (!canvas || isRevealedRef.current) return;
@@ -276,8 +300,12 @@ export function ScratchToReveal() {
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
+    // Generous wide brush size (68px on mobile, 88px on desktop) for rapid fast reveal
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const brushSize = isMobile ? 68 : 88;
+
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.lineWidth = 52;
+    ctx.lineWidth = brushSize;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
@@ -288,7 +316,7 @@ export function ScratchToReveal() {
       ctx.stroke();
     } else {
       ctx.beginPath();
-      ctx.arc(x, y, 26, 0, Math.PI * 2);
+      ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -305,7 +333,7 @@ export function ScratchToReveal() {
   const handleMouseMove = (e) => {
     if (!isScratchingRef.current || isRevealed) return;
     scratch(e.clientX, e.clientY);
-    checkScratchPercentage();
+    throttledCheck();
   };
 
   const handleMouseUp = () => {
@@ -314,7 +342,7 @@ export function ScratchToReveal() {
     checkScratchPercentage();
   };
 
-  // Touch Scratch Handlers (with non-passive scroll lock on canvas)
+  // Touch Scratch Handlers with non-passive touchmove for accurate swipe tracking
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -328,11 +356,10 @@ export function ScratchToReveal() {
 
     const handleTouchMove = (e) => {
       if (!isScratchingRef.current || isRevealedRef.current || e.touches.length === 0) return;
-      // Prevent default page scroll while user is actively scratching
       if (e.cancelable) e.preventDefault();
       const touch = e.touches[0];
       scratch(touch.clientX, touch.clientY);
-      checkScratchPercentage();
+      throttledCheck();
     };
 
     const handleTouchEnd = () => {
@@ -350,7 +377,7 @@ export function ScratchToReveal() {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [scratch, checkScratchPercentage]);
+  }, [scratch, throttledCheck, checkScratchPercentage]);
 
   // Instant full reveal button
   const handleRevealInstantly = () => {
@@ -365,116 +392,117 @@ export function ScratchToReveal() {
   const gcalUrl = createGoogleCalendarUrl(weddingEvent, couple.fullName);
 
   return (
-    <section id="scratch-reveal" className="py-20 px-4 sm:px-6 lg:px-8 bg-ambient-temple relative">
+    <section id="scratch-reveal" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-ambient-temple relative">
       <div className="max-w-4xl mx-auto text-center">
         {/* Section Header */}
-        <div className="inline-flex items-center space-x-2 px-5 py-1.5 rounded-full bg-maroon-night/90 border border-brass/55 text-brass-soft text-xs font-semibold uppercase tracking-[0.25em] mb-4 shadow-sm backdrop-blur-md">
+        <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-maroon-night/90 border border-brass/55 text-brass-soft text-xs font-semibold uppercase tracking-[0.22em] mb-3 shadow-sm backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5 text-brass" />
           <span>Interactive Wedding Reveal</span>
           <Sparkles className="w-3.5 h-3.5 text-brass" />
         </div>
 
-        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-1 text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
           Scratch to Reveal
         </h2>
-        <p className="font-serif italic text-[#FFCF5C] text-base sm:text-lg mb-2">
+        <p className="font-serif italic text-[#FFCF5C] text-sm sm:text-base mb-6">
           Our Main Wedding Date &amp; Couple Photo
         </p>
-        <p className="text-paper/85 text-xs sm:text-sm max-w-lg mx-auto font-light mb-8">
-          Rub your finger or mouse cursor across the golden card below to unveil Satish Reddy &amp; Alekhya with the sacred wedding Muhurtham details!
-        </p>
 
-        {/* Scratch Card Outer Wrapper */}
+        {/* Scratch Card Outer Wrapper: Designed to be fully visible on screen */}
         <div
           ref={containerRef}
-          className="relative max-w-lg sm:max-w-xl mx-auto rounded-3xl overflow-hidden border-2 border-brass/90 shadow-[0_20px_60px_-15px_rgba(15,3,5,0.9),0_0_40px_rgba(201,146,47,0.35)] bg-gradient-to-b from-[#1C0508] via-[#2A080C] to-[#120204]"
+          className="relative max-w-lg md:max-w-3xl mx-auto rounded-3xl overflow-hidden border-2 border-brass/90 shadow-[0_20px_60px_-15px_rgba(15,3,5,0.9),0_0_40px_rgba(201,146,47,0.35)] bg-gradient-to-b from-[#1C0508] via-[#2A080C] to-[#120204]"
         >
           {/* UNDERNEATH LAYER: The Revealed Couple Image & Wedding Date */}
-          <div className="relative w-full p-5 sm:p-7 text-center select-none flex flex-col items-center">
+          <div className="relative w-full p-4 sm:p-6 text-center select-none flex flex-col items-center">
             {/* 1. Auspicious Blessing Header */}
-            <div className="mb-4">
-              <div className="inline-flex items-center space-x-1.5 px-4 py-1 rounded-full bg-[#180306]/95 border border-brass/70 backdrop-blur-md shadow-xs mb-2">
-                <Heart className="w-3 h-3 text-brass-glow fill-brass-glow animate-pulse" />
-                <span className="text-[11px] font-serif text-[#FFD77D] tracking-[0.2em] uppercase font-bold">
-                  ॥ Sri Ganeshaya Namaha • Shubh Vivah ॥
-                </span>
-                <Heart className="w-3 h-3 text-brass-glow fill-brass-glow animate-pulse" />
-              </div>
-
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
-                Satish Reddy &amp; Alekhya
-              </h3>
+            <div className="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full bg-[#180306]/95 border border-brass/70 backdrop-blur-md shadow-xs mb-4">
+              <Heart className="w-3 h-3 text-brass-glow fill-brass-glow animate-pulse" />
+              <span className="text-[10px] sm:text-[11px] font-serif text-[#FFD77D] tracking-[0.2em] uppercase font-bold">
+                ॥ Sri Ganeshaya Namaha • Shubh Vivah ॥
+              </span>
+              <Heart className="w-3 h-3 text-brass-glow fill-brass-glow animate-pulse" />
             </div>
 
-            {/* 2. Revealed Couple Photo - Crisp, Beautiful and Unobscured */}
-            <div className="relative w-full max-w-sm sm:max-w-md mx-auto rounded-2xl overflow-hidden border-2 border-brass/85 shadow-[0_12px_35px_rgba(0,0,0,0.85)] group mb-5">
-              <img
-                src="/images/couple.jpg"
-                alt="Satish Reddy & Alekhya"
-                className="w-full h-auto max-h-[380px] sm:max-h-[420px] object-cover object-top transition-transform duration-700 group-hover:scale-105"
-              />
+            {/* 2. Responsive 2-Column Layout on md+ so entire card fits on screen without scrolling */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center w-full">
+              {/* Left: Revealed Couple Photo */}
+              <div className="relative w-full max-w-[280px] sm:max-w-xs mx-auto rounded-2xl overflow-hidden border-2 border-brass/85 shadow-[0_12px_35px_rgba(0,0,0,0.85)] group">
+                <img
+                  src="/images/couple.jpg"
+                  alt="Satish Reddy & Alekhya"
+                  onLoad={initCanvas}
+                  className="w-full h-56 sm:h-64 md:h-80 object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                />
 
-              {/* Gentle inner border & corner glow */}
-              <div className="absolute inset-0 ring-1 ring-inset ring-brass/40 rounded-2xl pointer-events-none" />
-              <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#140305]/90 via-[#140305]/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 ring-1 ring-inset ring-brass/40 rounded-2xl pointer-events-none" />
+                <div className="absolute bottom-0 inset-x-0 h-14 bg-gradient-to-t from-[#140305]/95 via-[#140305]/50 to-transparent pointer-events-none" />
 
-              {/* Photo Caption Badge */}
-              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center">
-                <span className="bg-[#140305]/90 border border-brass/70 text-[#FFD77D] text-[11px] font-serif tracking-[0.2em] uppercase px-3 py-1 rounded-full shadow-md backdrop-blur-md">
-                  Together in Love
-                </span>
-              </div>
-            </div>
-
-            {/* 3. Revealed Main Wedding Ceremony & Muhurtham Date Box */}
-            <div className="w-full max-w-md mx-auto bg-gradient-to-b from-[#1C0508]/95 to-[#120204]/95 border-2 border-brass/80 rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-md">
-              <div className="flex items-center justify-center space-x-2 text-brass-glow text-xs uppercase tracking-widest font-semibold mb-1">
-                <Calendar className="w-4 h-4 text-brass" />
-                <span className="text-[#FFD77D] font-bold">The Main Wedding Ceremony</span>
+                <div className="absolute bottom-2.5 inset-x-0 flex items-center justify-center">
+                  <span className="bg-[#140305]/90 border border-brass/70 text-[#FFD77D] text-[10px] font-serif tracking-[0.2em] uppercase px-3 py-0.5 rounded-full shadow-md backdrop-blur-md">
+                    Together in Love
+                  </span>
+                </div>
               </div>
 
-              <div className="font-serif text-xl sm:text-2xl font-bold text-[#FFFDF0] tracking-wide mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                Wednesday, December 23, 2026
+              {/* Right: Sacred Wedding Ceremony Details */}
+              <div className="flex flex-col justify-center text-center md:text-left space-y-3 px-1 sm:px-2">
+                <div>
+                  <span className="text-[11px] font-serif text-[#FFCF5C] uppercase tracking-[0.22em] font-medium">
+                    The Sacred Union
+                  </span>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                    Satish Reddy &amp; Alekhya
+                  </h3>
+                </div>
+
+                {/* Wedding Date & Muhurtham Box */}
+                <div className="bg-[#180306]/90 border border-brass/75 rounded-2xl p-3.5 sm:p-4 shadow-xl backdrop-blur-md">
+                  <div className="flex items-center justify-center md:justify-start space-x-2 text-xs uppercase tracking-wider font-semibold text-[#FFD77D] mb-1">
+                    <Calendar className="w-4 h-4 text-brass shrink-0" />
+                    <span className="font-bold">Wednesday, December 23, 2026</span>
+                  </div>
+
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-maroon-night/90 border border-brass/50 text-xs font-bold text-[#FFD77D] tracking-wider uppercase my-1.5">
+                    <Clock className="w-3.5 h-3.5 text-brass shrink-0" />
+                    <span>Sacred Muhurtham: 9:30 AM (ET)</span>
+                  </div>
+
+                  <div className="pt-2.5 mt-2 border-t border-brass/30 flex items-center justify-center md:justify-start space-x-1.5 text-xs text-[#FFF6D8]/95">
+                    <MapPin className="w-3.5 h-3.5 text-brass shrink-0" />
+                    <span className="font-medium text-[11px] sm:text-xs">Royal Albert's Palace, Fords, NJ</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons for Revealed Card */}
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
+                  <a
+                    href={gcalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-brass/65 hover:border-brass bg-[#180306] hover:bg-brass/25 text-[#FFF6D8] text-[11px] font-semibold uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                  >
+                    <CalendarPlus className="w-3.5 h-3.5 text-brass" />
+                    <span>Google Cal</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => downloadIcsFile(weddingEvent, couple.fullName)}
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-brass/65 hover:border-brass bg-[#180306] hover:bg-brass/25 text-[#FFF6D8] text-[11px] font-semibold uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 text-brass" />
+                    <span>.ICS</span>
+                  </button>
+
+                  <a
+                    href="#rsvp"
+                    className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-maroon-temple via-[#912433] to-maroon-temple hover:from-maroon-royal hover:to-maroon-deep text-[#FFFDF8] text-[11px] font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-luxury-hover border border-brass/70 cursor-pointer"
+                  >
+                    <span>RSVP for Wedding</span>
+                  </a>
+                </div>
               </div>
-
-              <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-maroon-night/80 border border-brass/50 text-sm font-bold text-[#FFD77D] tracking-wider uppercase mb-3">
-                <Clock className="w-3.5 h-3.5 text-brass" />
-                <span>Sacred Muhurtham: 9:30 AM (Eastern Time)</span>
-              </div>
-
-              <div className="pt-2.5 border-t border-brass/30 flex items-center justify-center space-x-1.5 text-xs text-[#FFF6D8]/95">
-                <MapPin className="w-4 h-4 text-brass shrink-0" />
-                <span className="font-medium">Royal Albert's Palace, 1050 King Georges Post Rd, Fords, NJ 08863</span>
-              </div>
-            </div>
-
-            {/* 4. Action Buttons for Revealed Card */}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 w-full max-w-md">
-              <a
-                href={gcalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full border border-brass/65 hover:border-brass bg-[#180306] hover:bg-brass/25 text-[#FFF6D8] text-xs font-semibold uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
-              >
-                <CalendarPlus className="w-3.5 h-3.5 text-brass" />
-                <span>Google Calendar</span>
-              </a>
-
-              <button
-                type="button"
-                onClick={() => downloadIcsFile(weddingEvent, couple.fullName)}
-                className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full border border-brass/65 hover:border-brass bg-[#180306] hover:bg-brass/25 text-[#FFF6D8] text-xs font-semibold uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-brass" />
-                <span>Download .ICS</span>
-              </button>
-
-              <a
-                href="#rsvp"
-                className="inline-flex items-center space-x-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-maroon-temple via-[#912433] to-maroon-temple hover:from-maroon-royal hover:to-maroon-deep text-[#FFFDF8] text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-luxury-hover border border-brass/70 cursor-pointer"
-              >
-                <span>RSVP for Wedding</span>
-              </a>
             </div>
           </div>
 
@@ -493,27 +521,27 @@ export function ScratchToReveal() {
         </div>
 
         {/* Scratch Progress & Controls */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {!isRevealed ? (
             <>
               <button
                 type="button"
                 onClick={handleRevealInstantly}
-                className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-maroon-temple via-[#8B202E] to-maroon-temple hover:from-maroon-royal hover:to-maroon-deep text-paper text-xs uppercase tracking-wider font-bold transition-all shadow-md hover:shadow-luxury-hover border border-brass/70 cursor-pointer transform hover:-translate-y-0.5"
+                className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-gradient-to-r from-maroon-temple via-[#8B202E] to-maroon-temple hover:from-maroon-royal hover:to-maroon-deep text-paper text-xs uppercase tracking-wider font-bold transition-all shadow-md hover:shadow-luxury-hover border border-brass/70 cursor-pointer transform hover:-translate-y-0.5"
               >
                 <Eye className="w-4 h-4 text-brass-glow" />
                 <span>Reveal Instantly</span>
               </button>
 
               {percentScratched > 0 && (
-                <div className="text-xs text-brass-soft font-semibold px-4 py-1.5 rounded-full bg-[#1A0407] border border-brass/50 shadow-xs">
+                <div className="text-xs text-brass-soft font-semibold px-4 py-1 rounded-full bg-[#1A0407] border border-brass/50 shadow-xs">
                   {percentScratched}% Scratched
                 </div>
               )}
             </>
           ) : (
             <div className="flex items-center space-x-3 animate-fade-in">
-              <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/85 px-4 py-2 rounded-full border border-emerald-500/50 flex items-center space-x-1.5 shadow-md">
+              <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/85 px-4 py-1.5 rounded-full border border-emerald-500/50 flex items-center space-x-1.5 shadow-md">
                 <span>✨</span>
                 <span>Date &amp; Couple Revealed!</span>
               </span>
@@ -521,7 +549,7 @@ export function ScratchToReveal() {
               <button
                 type="button"
                 onClick={initCanvas}
-                className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-[#180306] hover:bg-maroon-deep text-paper text-xs uppercase tracking-wider font-semibold border border-brass/70 transition-colors shadow-sm cursor-pointer"
+                className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-[#180306] hover:bg-maroon-deep text-paper text-xs uppercase tracking-wider font-semibold border border-brass/70 transition-colors shadow-sm cursor-pointer"
                 title="Scratch card again"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-brass" />
