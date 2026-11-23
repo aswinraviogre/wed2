@@ -102,7 +102,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
     return Object.keys(errs).length === 0;
   };
 
-// Pure Frontend Submission Handler with Direct WhatsApp Route (+91 95731 33550)
+// Direct Submission Handler to Google Sheets Web App
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -123,69 +123,17 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
         created_at: new Date().toISOString(),
       };
 
-      // 1. Build Elegant WhatsApp Message for +91 95731 33550
-      const eventsMap = new Map(events.map((evt) => [evt.id, evt]));
-      const attendingEvents = (payload.selected_events || [])
-        .map((id) => eventsMap.get(id))
-        .filter(Boolean)
-        .map((evt) => `  • ${evt.title} (${evt.dateLabel} @ ${evt.time})`);
-
-      const msgLines = [
-        '✨ *WEDDING RSVP — Satish Reddy & Alekhya* ✨',
-        '-----------------------------------------',
-        `👤 *Guest Name:* ${payload.guest_name}`,
-        `💌 *Response:* ${isAttending ? 'Joyfully Accept ✅' : 'Regretfully Decline ❌'}`,
-      ];
-
-      if (isAttending) {
-        msgLines.push(`👥 *Total Attendees:* ${payload.attendees_count}`);
-        if (payload.additional_guests && payload.additional_guests.trim()) {
-          msgLines.push(`📝 *Additional Guests:* ${payload.additional_guests.trim()}`);
-        }
-        if (payload.phone_number) {
-          msgLines.push(`📞 *Phone:* ${payload.phone_number}`);
-        }
-        if (payload.guest_email) {
-          msgLines.push(`📧 *Email:* ${payload.guest_email}`);
-        }
-        if (attendingEvents.length > 0) {
-          msgLines.push('', `🎉 *Celebrations Attending (${attendingEvents.length}):*`);
-          attendingEvents.forEach((line) => msgLines.push(line));
-        } else {
-          msgLines.push('', '🎉 *Celebrations Attending:* All Celebrations');
-        }
-        if (payload.dietary_requirements && payload.dietary_requirements.trim()) {
-          msgLines.push('', `🍽️ *Dietary Preferences:* ${payload.dietary_requirements.trim()}`);
-        }
-      }
-
-      if (payload.special_requests && payload.special_requests.trim()) {
-        msgLines.push('', `💬 *Wishes / Message:* "${payload.special_requests.trim()}"`);
-      }
-
-      msgLines.push('', '-----------------------------------------');
-      msgLines.push('💒 *Sacred Muhurtham:* Wed, Dec 23, 2026 @ 9:30 AM');
-      msgLines.push('📍 *Venue:* Royal Albert\'s Palace, Fords, NJ');
-      msgLines.push('Sent via Satish & Alekhya Wedding Portal');
-
-      const whatsappText = msgLines.join('\n');
-      const whatsappPhone = weddingConfig.rsvpWhatsapp?.phoneNumber || '919573133550';
-      const whatsappDisplay = weddingConfig.rsvpWhatsapp?.displayNumber || '+91 95731 33550';
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(whatsappText)}`;
-
-      // 1b. Asynchronously log RSVP to Google Sheets Web App (if configured)
+      // 1. Submit directly to Google Sheets Web App
       const sheetUrl = weddingConfig.rsvpGoogleSheet?.scriptUrl || (typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_GOOGLE_SHEET_URL : '');
       if (sheetUrl && sheetUrl.trim().length > 0 && !sheetUrl.includes('YOUR_GOOGLE')) {
         try {
-          fetch(sheetUrl.trim(), {
+          await fetch(sheetUrl.trim(), {
             method: 'POST',
             mode: 'no-cors',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
-          }).catch((sheetErr) => {
-            console.warn('Google Sheets RSVP sync notice:', sheetErr);
           });
         } catch (sheetError) {
           console.warn('Google Sheets submission handler notice:', sheetError);
@@ -195,25 +143,19 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
       // 2. Save client-side in localStorage for safety and reference
       try {
         const saved = JSON.parse(localStorage.getItem('wedding_rsvps') || '[]');
-        saved.unshift({ ...payload, whatsappSent: true });
+        saved.unshift({ ...payload, submitted: true });
         localStorage.setItem('wedding_rsvps', JSON.stringify(saved.slice(0, 50)));
       } catch (err) {}
 
-      // 3. Open WhatsApp directly in new window / tab
-      if (typeof window !== 'undefined') {
-        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      }
+      // Slight natural feedback delay for smooth UX
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Slight natural feedback delay
-      await new Promise((resolve) => setTimeout(resolve, 400));
-
-      // 4. Trigger success confirmation modal with direct link fallback
+      // 3. Trigger success confirmation modal
       if (onSuccessSubmission) {
         onSuccessSubmission({
           guest_name: payload.guest_name,
           attendance_status: payload.attendance_status,
-          whatsappUrl,
-          whatsappDisplay,
+          attendees_count: payload.attendees_count,
         });
       }
 
@@ -704,20 +646,18 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               className={`w-full sm:w-auto min-w-[320px] px-8 py-4 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-temple cursor-pointer ${
                 isSubmitting
                   ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#19592E] via-[#25D366] to-[#19592E] hover:from-[#144724] hover:via-[#20BD5A] hover:to-[#144724] text-white hover:shadow-[0_15px_35px_rgba(37,211,102,0.4)] border border-emerald-300/40 transform hover:-translate-y-0.5'
+                  : 'bg-gradient-to-r from-maroon-deep via-maroon-temple to-maroon-deep hover:from-maroon-night hover:via-maroon-deep hover:to-maroon-night text-paper hover:shadow-[0_15px_35px_rgba(90,24,39,0.4)] border border-brass/50 transform hover:-translate-y-0.5'
               }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Opening WhatsApp...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-brass" />
+                  <span>Submitting RSVP...</span>
                 </span>
               ) : (
                 <span className="flex items-center justify-center space-x-2.5">
-                  <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
-                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.16C10.57 20.16 9.13 19.76 7.86 19.01L7.56 18.83L4.44 19.65L5.27 16.61L5.07 16.3C4.24 14.98 3.81 13.47 3.81 11.91C3.81 7.37 7.5 3.68 12.05 3.68C14.25 3.68 16.31 4.54 17.87 6.1C19.42 7.66 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.05 20.16ZM16.57 14.39C16.32 14.27 15.11 13.67 14.88 13.58C14.66 13.5 14.5 13.46 14.34 13.7C14.18 13.95 13.71 14.5 13.57 14.67C13.43 14.83 13.28 14.85 13.04 14.73C12.79 14.61 11.99 14.35 11.04 13.5C10.3 12.84 9.8 12.03 9.66 11.78C9.52 11.54 9.64 11.41 9.77 11.29C9.88 11.17 10.02 10.99 10.15 10.84C10.27 10.68 10.31 10.56 10.39 10.39C10.47 10.23 10.43 10.09 10.37 9.97C10.31 9.84 9.83 8.66 9.62 8.17C9.43 7.69 9.23 7.76 9.08 7.75C8.93 7.74 8.77 7.74 8.61 7.74C8.44 7.74 8.18 7.8 7.95 8.05C7.72 8.3 7.08 8.9 7.08 10.12C7.08 11.34 7.97 12.52 8.09 12.68C8.22 12.84 9.84 15.34 12.33 16.41C12.92 16.67 13.38 16.82 13.74 16.94C14.34 17.13 14.88 17.1 15.31 17.04C15.79 16.97 16.78 16.44 16.99 15.86C17.19 15.27 17.19 14.77 17.13 14.67C17.07 14.56 16.82 14.51 16.57 14.39Z" />
-                  </svg>
-                  <span>CONFIRM &amp; SEND RSVP VIA WHATSAPP</span>
+                  <Check className="w-5 h-5 text-brass stroke-[2.5]" />
+                  <span>CONFIRM &amp; SUBMIT RSVP</span>
                 </span>
               )}
             </button>
