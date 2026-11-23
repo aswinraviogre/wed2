@@ -132,7 +132,7 @@ export function Welcome() {
                   "With the blessings of our parents and elders, and the love of those closest to our hearts, we invite you to celebrate the holy union of Satish Reddy &amp; Alekhya."
                 </p>
                 <p className="text-[#FFF6D8]/90 leading-relaxed font-light text-sm sm:text-base drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                  Together with their families, <strong>Sandhya &amp; Jeevan Reddy</strong> and <strong>Sujatha &amp; Rajagopal Thirumala</strong> warmly request the pleasure of your gracious company as our children begin their sacred journey of marriage.
+                  Together with their families, <strong>Sandhya &amp; Jeevan Reddy Sadhu</strong> and <strong>Sujatha &amp; Rajagopalacharyulu Thirumala</strong> warmly request the pleasure of your gracious company as our children begin their sacred journey of marriage.
                 </p>
                 <p className="text-[#FFF6D8]/90 leading-relaxed font-light text-sm sm:text-base drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
                   From traditional pre-wedding ceremonies at our residence in Avenel to the sacred wedding Muhurtham and grand reception at Royal Albert's Palace in Fords, New Jersey, your presence will make our celebrations truly unforgettable.

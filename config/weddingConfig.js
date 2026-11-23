@@ -24,8 +24,8 @@ export const weddingConfig = {
     locationSummary: "New Jersey, USA",
     venueSummary: "Royal Albert's Palace, Fords, NJ",
     tagline: "With the Blessings of Our Families. A Lifetime of Love.",
-    groomParents: "Sandhya & Jeevan Reddy",
-    brideParents: "Sujatha & Rajagopal Thirumala",
+    groomParents: "Sandhya & Jeevan Reddy Sadhu",
+    brideParents: "Sujatha & Rajagopalacharyulu Thirumala",
     invitationNote: "Invitation by both parents",
   },
 
@@ -55,7 +55,7 @@ export const weddingConfig = {
   },
 
   hero: {
-    salutation: "Sandhya & Jeevan Reddy and Sujatha & Rajagopal Thirumala",
+    salutation: "Sandhya & Jeevan Reddy Sadhu / Sujatha and Rajagopalacharyulu Thirumala",
     subSalutation: "CORDIALLY INVITE YOU TO CELEBRATE THE WEDDING OF",
     dates: "December 21–23, 2026",
     location: "Fords & Avenel, New Jersey",
@@ -66,13 +66,13 @@ export const weddingConfig = {
     title: "Thank You for Being Part of Our Celebrations!",
     subtitle: "Your RSVP has been received successfully.",
     body: "We are overjoyed to share these auspicious moments with you and look forward to celebrating together in New Jersey.",
-    signature: "With love & blessings,\nSandhya & Jeevan Reddy\nSujatha & Rajagopal Thirumala\nSatish & Alekhya",
+    signature: "With love & blessings,\nSandhya & Jeevan Reddy Sadhu\nSujatha & Rajagopalacharyulu Thirumala\nSatish & Alekhya",
   },
 
   footer: {
     line1: "Satish & Alekhya",
     line2: "December 21–23, 2026 • New Jersey, USA",
-    blessing: "With the blessings of Sandhya & Jeevan Reddy and Sujatha & Rajagopal Thirumala.",
+    blessing: "With the blessings of Sandhya & Jeevan Reddy Sadhu and Sujatha & Rajagopalacharyulu Thirumala.",
     traditionText: "॥ Sri Ganeshaya Namaha • Shubh Vivah ॥",
     venuesCredit: "Royal Albert's Palace (Fords, NJ) & 216 Peach St (Avenel, NJ)",
   },

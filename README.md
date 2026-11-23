@@ -7,8 +7,8 @@ A luxurious, traditional Indian wedding invitation website and multi-event RSVP 
 - **Bride**: Alekhya
 - **Wedding Date**: December 23, 2026
 - **Muhurtham**: 9:30 AM Wednesday (Eastern Time)
-- **Groom Parents**: Sandhya & Jeevan Reddy
-- **Bride Parents**: Sujatha & Rajagopal Thirumala
+- **Groom Parents**: Sandhya & Jeevan Reddy Sadhu
+- **Bride Parents**: Sujatha & Rajagopalacharyulu Thirumala
 - **Invitation**: By both parents
 - **Wedding Venue**: Royal Albert's Palace, 1050 King Georges Post Rd, Fords, NJ 08863
 

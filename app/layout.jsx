@@ -9,7 +9,7 @@ export const metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Satish & Alekhya | Wedding Invitation',
   description:
-    "Sandhya & Jeevan Reddy and Sujatha & Rajagopal Thirumala cordially invite you to celebrate the wedding of Satish Reddy & Alekhya on December 21–23, 2026 in New Jersey, USA. Sacred Muhurtham on Dec 23, 2026 at Royal Albert's Palace, Fords, NJ.",
+    "Sandhya & Jeevan Reddy Sadhu and Sujatha & Rajagopalacharyulu Thirumala cordially invite you to celebrate the wedding of Satish Reddy & Alekhya on December 21–23, 2026 in New Jersey, USA. Sacred Muhurtham on Dec 23, 2026 at Royal Albert's Palace, Fords, NJ.",
   keywords: [
     'Satish Reddy',
     'Alekhya',

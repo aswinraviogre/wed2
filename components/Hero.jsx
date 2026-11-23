@@ -37,7 +37,7 @@ export function Hero() {
         {/* Parents' Salutation - Invitation by Both Parents */}
         <div className="mb-2">
           <p className="text-xs uppercase tracking-[0.25em] text-[#FFCF5C] font-semibold mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
-            Sandhya &amp; Jeevan Reddy &amp; Sujatha &amp; Rajagopal Thirumala
+            Sandhya &amp; Jeevan Reddy Sadhu / Sujatha and Rajagopalacharyulu Thirumala
           </p>
           <p className="font-serif text-xs sm:text-sm text-paper tracking-[0.25em] uppercase font-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
             CORDIALLY INVITE YOU TO CELEBRATE THE WEDDING OF

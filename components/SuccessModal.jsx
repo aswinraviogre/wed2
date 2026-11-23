@@ -99,7 +99,7 @@ export function SuccessModal({ isOpen, onClose, submissionData }) {
           {couple.fullName}
         </div>
         <p className="text-xs uppercase tracking-widest text-maroon-temple font-semibold mb-8">
-          With Blessings from Sandhya &amp; Jeevan Reddy and Sujatha &amp; Rajagopal Thirumala
+          With Blessings from Sandhya &amp; Jeevan Reddy Sadhu and Sujatha &amp; Rajagopalacharyulu Thirumala
         </p>
 
         <div>
