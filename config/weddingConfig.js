@@ -37,7 +37,7 @@ export const weddingConfig = {
   rsvpGoogleSheet: {
     // Paste your deployed Google Apps Script Web App URL below
     // Example: "https://script.google.com/macros/s/AKfycbx.../exec"
-    scriptUrl: "",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbyNcoc-wmHOADk_0mo_csN8BwKx839VSKGXpvIbe6O09aM0y0mQ8gzCIyLQ1onom5Zb/exec",
   },
 
   timezone: {
