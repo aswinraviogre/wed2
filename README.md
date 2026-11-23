@@ -22,7 +22,7 @@ A luxurious, traditional Indian wedding invitation website and multi-event RSVP 
 
 ## Features
 - **Temple Gopuram Gateway Reveal**: Interactive 3D temple gate split reveal opening experience.
-- **Visual Design & Atmosphere**: Authentic Toran Telugu color palette, floating jasmine petals, golden ember canvas, and Shirdi Sai Baba blessing medallion.
+- **Visual Design & Atmosphere**: Authentic Toran Telugu color palette, floating jasmine petals, golden ember canvas, and Lord Venkateshwara divine blessings.
 - **Live Countdown**: Timezone-aware countdown targeting the sacred Muhurtham (Eastern Time, America/New_York).
 - **Multi-Event RSVP Form**: Intuitive multi-event selection, guest count, dietary requests, warm wishes, and client-side storage.
 - **Calendar Integration**: One-click Google Calendar add and RFC-5545 Apple / Outlook (.ics) calendar file generation for all 6 events.
