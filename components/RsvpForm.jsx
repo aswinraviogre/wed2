@@ -173,6 +173,25 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
       const whatsappDisplay = weddingConfig.rsvpWhatsapp?.displayNumber || '+91 95731 33550';
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(whatsappText)}`;
 
+      // 1b. Asynchronously log RSVP to Google Sheets Web App (if configured)
+      const sheetUrl = weddingConfig.rsvpGoogleSheet?.scriptUrl || (typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_GOOGLE_SHEET_URL : '');
+      if (sheetUrl && sheetUrl.trim().length > 0 && !sheetUrl.includes('YOUR_GOOGLE')) {
+        try {
+          fetch(sheetUrl.trim(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          }).catch((sheetErr) => {
+            console.warn('Google Sheets RSVP sync notice:', sheetErr);
+          });
+        } catch (sheetError) {
+          console.warn('Google Sheets submission handler notice:', sheetError);
+        }
+      }
+
       // 2. Save client-side in localStorage for safety and reference
       try {
         const saved = JSON.parse(localStorage.getItem('wedding_rsvps') || '[]');

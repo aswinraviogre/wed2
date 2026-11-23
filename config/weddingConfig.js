@@ -34,6 +34,12 @@ export const weddingConfig = {
     displayNumber: "+91 95731 33550",
   },
 
+  rsvpGoogleSheet: {
+    // Paste your deployed Google Apps Script Web App URL below
+    // Example: "https://script.google.com/macros/s/AKfycbx.../exec"
+    scriptUrl: "",
+  },
+
   timezone: {
     name: "America/New_York",
     label: "Eastern Time (ET)",
